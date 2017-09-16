@@ -45,20 +45,18 @@
                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Instruments" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="R17-wU-P0w">
                     <rect key="frame" x="42" y="42" width="291" height="21"/>
                     <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                    <color key="textColor" red="0.67510094823404909" green="0.68178511603834657" blue="0.68178511603834657" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                    <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                     <nil key="highlightedColor"/>
                 </label>
-                <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" on="YES" translatesAutoresizingMaskIntoConstraints="NO" id="sf7-VA-dN0">
-                    <rect key="frame" x="285" y="199" width="51" height="31"/>
-                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" on="YES" translatesAutoresizingMaskIntoConstraints="NO" id="sf7-VA-dN0">
+                    <rect key="frame" x="276" y="209.5" width="51" height="31"/>
                     <color key="onTintColor" red="0.27991337560000001" green="0.53895903249999999" blue="0.69877518220000001" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                     <connections>
                         <action selector="vibrationSwitchChanged:" destination="-1" eventType="valueChanged" id="KGQ-zY-Pmx"/>
                     </connections>
                 </switch>
-                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Vibration:" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="kAp-UB-NJj">
-                    <rect key="frame" x="41" y="199" width="123" height="31"/>
-                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Vibration:" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="kAp-UB-NJj">
+                    <rect key="frame" x="50" y="214.5" width="73.5" height="20.5"/>
                     <fontDescription key="fontDescription" type="system" pointSize="17"/>
                     <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                     <nil key="highlightedColor"/>
@@ -98,7 +96,7 @@
                     <color key="backgroundColor" red="0.2490529393" green="0.47953882479999999" blue="0.62173525159999998" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                     <fontDescription key="fontDescription" name="Mohave-Bold" family="Mohave" pointSize="35"/>
                     <state key="normal" title="-">
-                        <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <color key="titleColor" red="0.085908019409999994" green="0.1682464799" blue="0.21578838759999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                     </state>
                     <connections>
                         <action selector="DownKeyButtonPressed:" destination="-1" eventType="touchUpInside" id="k99-UO-iyV"/>
@@ -109,7 +107,7 @@
                     <color key="backgroundColor" red="0.2490529393" green="0.47953882479999999" blue="0.62173525159999998" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                     <fontDescription key="fontDescription" name="Mohave-Bold" family="Mohave" pointSize="35"/>
                     <state key="normal" title="+">
-                        <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <color key="titleColor" red="0.085908019409999994" green="0.1682464799" blue="0.21578838759999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                     </state>
                     <connections>
                         <action selector="UpKeyButtonPressed:" destination="-1" eventType="touchUpInside" id="jbi-XM-uPE"/>
@@ -150,6 +148,7 @@
                 <constraint firstAttribute="trailing" secondItem="NqJ-dm-llv" secondAttribute="trailing" constant="36" id="89f-vZ-9HZ"/>
                 <constraint firstItem="xoC-fq-IRk" firstAttribute="top" secondItem="eIQ-Ap-BBs" secondAttribute="bottom" constant="8" id="9fc-p2-lGu"/>
                 <constraint firstItem="NqJ-dm-llv" firstAttribute="top" secondItem="83R-G2-WTd" secondAttribute="bottom" id="A5l-hu-d2o"/>
+                <constraint firstItem="sf7-VA-dN0" firstAttribute="trailing" secondItem="3Gs-h3-VjF" secondAttribute="trailing" constant="-8" id="CDW-Lo-ikZ"/>
                 <constraint firstItem="ZKM-Sc-8za" firstAttribute="leading" secondItem="jvP-DO-yxh" secondAttribute="leading" id="DfK-eJ-kGU"/>
                 <constraint firstItem="P5C-xZ-iJ7" firstAttribute="leading" secondItem="ZKM-Sc-8za" secondAttribute="trailing" constant="12" id="IHv-tI-6As"/>
                 <constraint firstItem="P5C-xZ-iJ7" firstAttribute="centerX" secondItem="i5M-Pr-FkT" secondAttribute="centerX" id="MbC-pq-MFI"/>
@@ -161,9 +160,12 @@
                 <constraint firstAttribute="trailing" secondItem="R17-wU-P0w" secondAttribute="trailing" constant="42" id="X2D-3h-cYn"/>
                 <constraint firstItem="xoC-fq-IRk" firstAttribute="leading" secondItem="i5M-Pr-FkT" secondAttribute="leading" constant="16" id="XBY-Uq-F6a"/>
                 <constraint firstItem="3Gs-h3-VjF" firstAttribute="height" secondItem="P5C-xZ-iJ7" secondAttribute="height" id="XoB-BH-Rnj"/>
+                <constraint firstItem="kAp-UB-NJj" firstAttribute="centerY" secondItem="sf7-VA-dN0" secondAttribute="centerY" id="bKa-T8-5bd"/>
                 <constraint firstItem="jvP-DO-yxh" firstAttribute="top" secondItem="R17-wU-P0w" secondAttribute="bottom" constant="3" id="ePR-vz-sJU"/>
                 <constraint firstItem="83R-G2-WTd" firstAttribute="leading" secondItem="i5M-Pr-FkT" secondAttribute="leading" constant="8" id="gt4-eR-DUF"/>
+                <constraint firstItem="kAp-UB-NJj" firstAttribute="top" secondItem="ZKM-Sc-8za" secondAttribute="bottom" constant="45" id="hYk-B4-xHj"/>
                 <constraint firstItem="83R-G2-WTd" firstAttribute="top" secondItem="xoC-fq-IRk" secondAttribute="bottom" constant="8" id="kej-OA-vK1"/>
+                <constraint firstItem="kAp-UB-NJj" firstAttribute="leading" secondItem="ZKM-Sc-8za" secondAttribute="leading" constant="8" id="kk2-Bw-hrY"/>
                 <constraint firstItem="3Gs-h3-VjF" firstAttribute="trailing" secondItem="jvP-DO-yxh" secondAttribute="trailing" id="nrf-NR-p6T"/>
                 <constraint firstAttribute="trailing" secondItem="xoC-fq-IRk" secondAttribute="trailing" constant="16" id="ywc-dd-Xn4"/>
                 <constraint firstAttribute="trailing" secondItem="jvP-DO-yxh" secondAttribute="trailing" constant="42" id="yzD-d9-8Cg"/>

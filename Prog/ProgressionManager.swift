@@ -34,6 +34,7 @@ public class ProgressionManager
     public static var prevNash = 0
     
     public static var quizInProgress = false
+    public static var quizIntroPlaying = false
     
     //backend
     static weak var delegate : ProgressionManagerDelegate?
@@ -189,7 +190,9 @@ public class ProgressionManager
         
         //play root twice
         PlayRoot()
+        quizIntroPlaying = true
         DispatchQueue.main.asyncAfter(deadline: .now() + noteTime, execute: {
+            quizIntroPlaying = false
             self.PlayNextChord()
         })
     }

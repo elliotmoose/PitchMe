@@ -18,4 +18,5 @@ public class ColorManager
     public static let themeGray = UIColor(hue: 145/360, saturation: 0, brightness: 0.55, alpha: 1)
     public static let themeLightBlue = UIColor(hue: 203/360, saturation: 0.60, brightness: 0.62, alpha: 1)
     public static let themeBlue = UIColor(hue: 203/360, saturation: 0.61, brightness: 0.4, alpha: 1)
+    public static let themeBlueDisabled = UIColor(hue: 203/360, saturation: 0.55, brightness: 0.41, alpha: 1)
 }

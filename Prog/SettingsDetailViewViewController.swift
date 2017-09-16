@@ -9,7 +9,7 @@
 import UIKit
 import StoreKit
 
-class SettingsDetailViewViewController: UIViewController {
+class SettingsDetailViewViewController: UIViewController,IAPManagerDelegate {
 
     public static let singleton = SettingsDetailViewViewController(nibName: "", bundle: Bundle.main)
     
@@ -45,6 +45,7 @@ class SettingsDetailViewViewController: UIViewController {
         unlockIcon.tintColor = ColorManager.themeGray
         
         IAPManager.productIdentifiers = NSSet(array: ["unlockAll","com.kohbroco.PitchMe.unlockAll"])
+        IAPManager.singleton.delegate = self
 
     }
     
@@ -88,9 +89,30 @@ class SettingsDetailViewViewController: UIViewController {
         }
     }
     
+    //BUYYYYY
     @IBAction func UnlockAllFeaturesButtonPressed(_ sender: UIButton) {
-        IAPManager.singleton.BuyProductWithID("com.kohbroco.PitchMe.unlockAll")
+        IAPManager.singleton.QueueProductPurchaseWithID("com.kohbroco.PitchMe.unlockAll")
     }
+    
+    //SUCCESS OR ERROR
+    func DidCompleteTransaction(success: Bool, identifiers: [String], error: String) {
+        if success
+        {
+            if identifiers.contains("com.kohbroco.PitchMe.unlockAll")
+            {
+                UserManager.UnlockFeatures()
+            }
+            else
+            {
+                NSLog("\(identifiers)")
+            }
+        }
+        else
+        {
+            PopupManager.singleton.Popup(title: "Error:", body: error, presentationViewCont: self)
+        }
+    }
+    
     
     func AnimateButton()
     {

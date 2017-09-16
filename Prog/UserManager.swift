@@ -16,7 +16,9 @@ public class UserManager
 {
     public static var experience : Int = 0
     public static var maxExpForLevel = [500,1000,2000,3000,5000,10000]
-    public static var currentLevel = 0    
+    public static var currentLevel = 0
+    public static var featuresUnlocked = false
+    public static var highscore : Int = 0
     
     weak static var delegate : UserManagerDelegate?
     
@@ -103,5 +105,40 @@ public class UserManager
             currentLevel = maxExpForLevel.count - 1
             ud.set(currentLevel, forKey: "level")
         }
+        
+        if let featuresUnlocked = ud.value(forKey: "featuresUnlocked") as? Bool
+        {
+            self.featuresUnlocked = featuresUnlocked
+        }
+        else
+        {
+            featuresUnlocked = false
+        }
+        
+        if let highscore = ud.value(forKey: "highscore") as? Int
+        {
+            self.highscore = highscore
+        }
+        else
+        {
+            highscore = 0
+        }
+        
+        featuresUnlocked = true
+    }
+    
+    public static func UnlockFeatures()
+    {
+        featuresUnlocked = true
+        
+        let ud = UserDefaults.standard
+        ud.set(true, forKey: "featuresUnlocked")
+    }
+    
+    public static func SetHighScore(score : Int)
+    {
+        let ud = UserDefaults.standard
+        ud.set(score, forKey: "highscore")
+        self.highscore = score
     }
 }

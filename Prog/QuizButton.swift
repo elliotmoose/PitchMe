@@ -27,10 +27,17 @@ class QuizButton: UIButton {
     
     public func SetNormal()
     {
-        self.backgroundColor = ColorManager.themeLight
+        if isEnabled
+        {
+            self.backgroundColor = ColorManager.themeLight
+        }
+        else
+        {
+            self.backgroundColor = ColorManager.themeBlueDisabled
+        }
     }
     
-    public func SetAnswwer()
+    public func SetAnswer()
     {
         self.backgroundColor = ColorManager.themeOrange
     }

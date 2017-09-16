@@ -17,6 +17,7 @@ class ViewController: UIViewController,UIScrollViewDelegate,ProgressionManagerDe
     
     @IBOutlet weak var scrollView: UIScrollView!
     
+    @IBOutlet weak var messageSubLabel2: UILabel!
     @IBOutlet weak var messageSubLabel: UILabel!
     @IBOutlet weak var messageLabel: UILabel!
     
@@ -24,7 +25,7 @@ class ViewController: UIViewController,UIScrollViewDelegate,ProgressionManagerDe
     
     @IBOutlet weak var beginQuizButton: UIButton!
     
-    @IBOutlet weak var arrowUp: UIImageView!
+    @IBOutlet weak var arrowUp: SpringImageView!
     
     @IBOutlet weak var settingsIcon: UIImageView!
 
@@ -49,6 +50,21 @@ class ViewController: UIViewController,UIScrollViewDelegate,ProgressionManagerDe
     @IBOutlet weak var experienceContainerView: UIView!
     @IBOutlet weak var progressBaseView: UIView!
     @IBOutlet weak var progressTrackView: UIView!
+    
+    //score
+    @IBOutlet weak var comboLabel: SpringLabel!
+    @IBOutlet weak var scoreLabel: UILabel!
+    @IBOutlet var livesImageViews: [SpringImageView]!
+    
+    @IBOutlet weak var difficultyMultiplierLabel: SpringLabel!
+    
+    //state
+    var arrowUpAnimating = false
+    
+    //game state
+    var lives = 3
+    var score = 0
+    var combo = 0
     
     let presets = [
         [0,0,0],
@@ -107,7 +123,6 @@ class ViewController: UIViewController,UIScrollViewDelegate,ProgressionManagerDe
         moreArrow.transform = moreArrow.transform.rotated(by: CGFloat(90*Double.pi/180))
         
         
-        
         //experience
         progressTrackView.clipsToBounds = true
         progressBaseView.clipsToBounds = true
@@ -128,10 +143,14 @@ class ViewController: UIViewController,UIScrollViewDelegate,ProgressionManagerDe
         
         SettingsManager.RandomizeKey()
         RefreshButtonsForKey()
+        
+        //init settings modes
+        SetChordMode(0)
     }
     
     override func viewWillAppear(_ animated: Bool) {
         RefreshButtonsForKey()
+        self.messageSubLabel2.text = "Highscore: \(UserManager.highscore)"
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -151,9 +170,21 @@ class ViewController: UIViewController,UIScrollViewDelegate,ProgressionManagerDe
             {
                 if button.tag+1 == 1
                 {
-                    button.SetAnswwer()
+                    button.SetAnswer()
                 }
             }
+            
+            UIView.animate(withDuration: 0.5, animations: {
+                self.messageLabel.alpha = 0
+                self.messageSubLabel.alpha = 0
+                self.messageSubLabel2.alpha = 0
+            }, completion: { (success) in
+                self.messageLabel.text = ""
+                self.messageSubLabel.text = ""
+                self.messageSubLabel2.text = ""
+                self.messageLabel.alpha = 1
+                self.messageSubLabel.alpha = 1
+            })
         }
         else //stop
         {
@@ -171,13 +202,20 @@ class ViewController: UIViewController,UIScrollViewDelegate,ProgressionManagerDe
                 UIView.animate(withDuration: 0.5, animations: {
                     self.messageLabel.alpha = 0
                     self.messageSubLabel.alpha = 0
+                    self.messageSubLabel2.alpha = 0
                 }, completion: { (success) in
                     self.messageLabel.text = "HELLO"
                     self.messageSubLabel.text = ""
+                    self.messageSubLabel2.text = "Highscore: \(UserManager.highscore)"
+                    
+                    //reset game
+                    self.Lose()
+                    self.RestartGame()
                     
                     UIView.animate(withDuration: 0.5, animations: {
                         self.messageLabel.alpha = 1
                         self.messageSubLabel.alpha = 1
+                        self.messageSubLabel2.alpha = 1
                     })
                 })
                 
@@ -190,6 +228,7 @@ class ViewController: UIViewController,UIScrollViewDelegate,ProgressionManagerDe
                 self.beginQuizButton.setTitle("START", for: .normal)
                 self.beginQuizButton.setTitleColor(ColorManager.themeGreen, for: .normal)
                 self.beginQuizButton.isEnabled = true
+
             })
             
         }
@@ -208,10 +247,12 @@ class ViewController: UIViewController,UIScrollViewDelegate,ProgressionManagerDe
     //=====================================================================================================================================================================================
     func Button_TouchUpInside(sender: QuizButton)
     {
-        if answeredCorrectly == true || !ProgressionManager.quizInProgress
+        if answeredCorrectly == true || !ProgressionManager.quizInProgress || ProgressionManager.quizIntroPlaying
         {
             return
         }
+
+        
         
         //check if correct note
         let chosenNash = sender.tag + 1
@@ -230,8 +271,7 @@ class ViewController: UIViewController,UIScrollViewDelegate,ProgressionManagerDe
             //Button UI
             sender.SetCorrect()
             
-            //experience
-            OffsetExperience(negative: false)
+            DidAnswer(correct: true)
         }
         else
         {
@@ -247,7 +287,7 @@ class ViewController: UIViewController,UIScrollViewDelegate,ProgressionManagerDe
             }
             
             
-            OffsetExperience(negative: true)
+            DidAnswer(correct: false)
             
             //vibrate
             if SettingsManager.vibrationOn
@@ -267,7 +307,7 @@ class ViewController: UIViewController,UIScrollViewDelegate,ProgressionManagerDe
             if button.tag+1 == ProgressionManager.prevNash && !answeredCorrectly
             {
                 prevNashButtonText = button.titleLabel!.text!
-                button.SetAnswwer()
+                button.SetAnswer()
             }
             else
             {
@@ -298,6 +338,78 @@ class ViewController: UIViewController,UIScrollViewDelegate,ProgressionManagerDe
     //                                                                              ANSWER REVIEW FUNCTIONS
     //
     //=====================================================================================================================================================================================
+    func DidAnswer(correct : Bool)
+    {
+
+        
+        if correct
+        {
+            
+            //
+            //score
+            //
+            
+            let scoreIncrement = Int(Float(1 + combo)*DifficultyFactor())
+            score = score + scoreIncrement
+            SpawnScoreAnimation(value: scoreIncrement)
+            
+            //experience
+            OffsetExperience(value: scoreIncrement)
+            
+            
+            //
+            //combo
+            //
+            
+            combo = combo + 1
+            
+        }
+        else
+        {
+            //
+            //combo
+            //
+            combo = 0
+            
+            //experience
+            OffsetExperience(value: -25)
+            
+            //
+            //LIVES
+            //
+            
+            //backend
+            lives = lives - 1
+            
+            //ui
+            var heartImage = SpringImageView()
+            for imageView in livesImageViews //get the imageView
+            {
+                if imageView.tag == lives
+                {
+                    heartImage = imageView
+                }
+            }
+            
+            heartImage.animation = "fadeOut"
+            heartImage.duration = 1
+            heartImage.curve = "easeIn"
+            heartImage.animate()
+            
+            //lose
+            if lives == 0
+            {
+                Lose()
+                RestartGame()
+            }
+        }
+        
+        //general UI
+        UpdateScoreAndComboLabels()
+        AnimateComboLabel()
+        
+    }
+    
     func ShowTick()
     {
         circleTick.image = #imageLiteral(resourceName: "CircleTick_0002_1x").withRenderingMode(.alwaysTemplate)
@@ -311,7 +423,6 @@ class ViewController: UIViewController,UIScrollViewDelegate,ProgressionManagerDe
         circleTick.delay = CGFloat(140/SettingsManager.bpm)
         circleTick.animation = "fadeOut"
         circleTick.animate()
-        
     }
     
     func ShowCross()
@@ -336,36 +447,40 @@ class ViewController: UIViewController,UIScrollViewDelegate,ProgressionManagerDe
         circleTick.layer.removeAllAnimations()
     }
     
+    func AnimateComboLabel()
+    {
+        comboLabel.animation = "fadeIn"
+        comboLabel.duration = 1
+        comboLabel.scaleX = 2.5
+        comboLabel.scaleY = 2.5
+        comboLabel.curve = "easeInOut"
+        comboLabel.animate()
+    }
+    
     //=====================================================================================================================================================================================
     //
     //                                                                              EXPERIENCE RELATED FUNCTIONS
     //
     //=====================================================================================================================================================================================
-    func OffsetExperience(negative : Bool)
+    func OffsetExperience(value : Int)
     {
         if !ProgressionManager.quizInProgress
         {
             return
         }
         
-        var offsetValue = 25
-
-        if negative
-        {
-            offsetValue = -offsetValue
-        }
+        var offsetValue = value
         
         UserManager.AddExperience(offsetValue)
-        SpawnScoreAnimation(value: offsetValue)
         UpdateExpProgressBar()
     }
     
     func SpawnScoreAnimation(value : Int)
     {
         
-        let spawnCoord = CGPoint(x: experienceContainerView.frame.origin.x  - 64, y: experienceContainerView.frame.origin.y)
+        let spawnCoord = CGPoint(x: scoreLabel.frame.origin.x + scoreLabel.frame.width  + 8, y: scoreLabel.frame.origin.y)
         let label = SpringLabel(frame: CGRect(x: spawnCoord.x, y: spawnCoord.y, width: 100, height:40))
-        label.font = UIFont(name: "Mohave-Bold", size: 35)
+        label.font = UIFont(name: "Mohave-Bold", size: 24)
         
         if value > 0
         {
@@ -413,12 +528,87 @@ class ViewController: UIViewController,UIScrollViewDelegate,ProgressionManagerDe
         //unlock ui
         RefreshAvailableFeatures()
         
+        //prompt settings
+        StartArrowAnimation()
         
         //Notify user that he leveled up
         expLevelLabel.animation = "zoomIn"
         expLevelLabel.duration = 1
         expLevelLabel.animate()
     }
+    
+    //=====================================================================================================================================================================================
+    //
+    //                                                                              GAME RELATED FUNCTIONS
+    //
+    //=====================================================================================================================================================================================
+    func Lose()
+    {
+        if score > UserManager.highscore
+        {
+            UserManager.SetHighScore(score: score)
+        }
+    }
+    
+    func RestartGame()
+    {
+        lives = 3
+        score = 0
+        combo = 0
+        
+        //ui
+        for heart in livesImageViews
+        {
+            heart.alpha = 1
+        }
+        
+        UpdateScoreAndComboLabels()
+    }
+    
+    func DifficultyFactor() -> Float
+    {
+        var factor : Float = 1
+        let chord = chordEnableSegCont.selectedSegmentIndex
+        let inversion = inversionsSegCont.selectedSegmentIndex
+        let oct = octRangeSegCont.selectedSegmentIndex
+        
+        //chord 0/1/2
+        switch chord {
+        case 1:
+            factor = factor * 2
+        case 2:
+            factor = factor * 3
+        default:
+            break
+        }
+        
+        //inversion 0/1/2/3
+        switch inversion {
+        case 1:
+            factor = factor * 1
+        case 2:
+            factor = factor * 1.5
+        case 3:
+            factor = factor * 2
+        default:
+            break
+        }
+        
+        //octave 0/1 
+        if oct == 1
+        {
+            factor = factor * 2
+        }
+        
+        return factor
+    }
+    
+    func UpdateScoreAndComboLabels()
+    {
+        scoreLabel.text = "\(score)"
+        comboLabel.text = "\(combo)"
+    }
+    
     //=====================================================================================================================================================================================
     //
     //                                                                               UNLOCK FEATURE FUNCTIONS
@@ -426,6 +616,19 @@ class ViewController: UIViewController,UIScrollViewDelegate,ProgressionManagerDe
     //=====================================================================================================================================================================================
     func RefreshAvailableFeatures()
     {
+        if UserManager.featuresUnlocked
+        {
+            inversionsSegCont.setEnabled(true, forSegmentAt: 1)
+            inversionsSegCont.setEnabled(true, forSegmentAt: 2)
+            inversionsSegCont.setEnabled(true, forSegmentAt: 3)
+            chordEnableSegCont.setEnabled(true, forSegmentAt: 1)
+            chordEnableSegCont.setEnabled(true, forSegmentAt: 2)
+            octRangeSegCont.setEnabled(true, forSegmentAt: 1)
+            SetDifficultySegContEnabledTillIndex(9)
+            return
+        }
+        
+        
         switch UserManager.currentLevel {
         case 0:
             inversionsSegCont.setEnabled(false, forSegmentAt: 1)
@@ -537,6 +740,38 @@ class ViewController: UIViewController,UIScrollViewDelegate,ProgressionManagerDe
     //
     //=====================================================================================================================================================================================
     
+    func AnimateArrow()
+    {
+        arrowUp.animation = "swing"
+        arrowUp.curve = "easeInOut"
+        arrowUp.scaleX = 2
+        arrowUp.scaleY = 2
+        arrowUp.duration = 0.5
+        arrowUp.animate()
+    }
+    
+    func StartArrowAnimation()
+    {
+        arrowUpAnimating = true
+        
+        if !arrowUpAnimating
+        {
+            return
+        }
+        
+        AnimateArrow()
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2.0, execute: {
+            self.StartArrowAnimation()
+        })
+    }
+    
+    func StopArrowAnimation()
+    {
+        arrowUp.layer.removeAllAnimations()
+        arrowUpAnimating = false
+    }
+    
     //SETTINGS UI IBACTIONS
     @IBAction func OpenSettingsButtonPressed(_ sender: Any) {
         scrollView.setContentOffset(CGPoint(x: 0, y: 350), animated: true)
@@ -551,14 +786,17 @@ class ViewController: UIViewController,UIScrollViewDelegate,ProgressionManagerDe
         
         //set allowed chords
         SetChordMode(sender.selectedSegmentIndex)
+        DidChangeSetting()
     }
     
     @IBAction func inversionSegContChanged(_ sender: UISegmentedControl) {
         SetInversionMode(sender.selectedSegmentIndex)
+        DidChangeSetting()
     }
     
     @IBAction func octaveSegContChanged(_ sender: UISegmentedControl) {
         SetOctaveMode(sender.selectedSegmentIndex)
+        DidChangeSetting()
     }
     
     @IBAction func difficultyPresetChanged(_ sender: UISegmentedControl) {
@@ -568,6 +806,8 @@ class ViewController: UIViewController,UIScrollViewDelegate,ProgressionManagerDe
         SetChordMode(thisDifficulty[0])
         SetInversionMode(thisDifficulty[1])
         SetOctaveMode(thisDifficulty[2])
+        
+        DidChangeSetting()
     }
     
     //backend functions
@@ -587,7 +827,22 @@ class ViewController: UIViewController,UIScrollViewDelegate,ProgressionManagerDe
             return
         }
         
-        DidChangeSetting()
+        //ui
+        for button in quizButtons
+        {
+            if ProgressionManager.nashvilleOptions.contains(button.tag + 1)
+            {
+                button.isEnabled = true
+                button.backgroundColor = ColorManager.themeLight
+            }
+            else
+            {
+                button.isEnabled = false
+                button.setTitleColor(ColorManager.themeGray, for: .disabled)
+                button.backgroundColor = ColorManager.themeBlueDisabled
+            }
+        }
+        
     }
     
     func SetInversionMode(_ index : Int)
@@ -596,16 +851,14 @@ class ViewController: UIViewController,UIScrollViewDelegate,ProgressionManagerDe
         
         inversionsSegCont.selectedSegmentIndex = index
         
-        DidChangeSetting()
     }
     
     func SetOctaveMode(_ index : Int)
     {
-        ProgressionManager.upperChordRange = index + 1
+        ProgressionManager.upperChordRange = index
         
         octRangeSegCont.selectedSegmentIndex = index
         
-        DidChangeSetting()
     }
     
     func DidChangeSetting()
@@ -630,6 +883,9 @@ class ViewController: UIViewController,UIScrollViewDelegate,ProgressionManagerDe
             //deselect all
             difficultySegCont.selectedSegmentIndex = -1
         }
+        
+        
+        difficultyMultiplierLabel.text = "DIFFICULTY MULTIPLIER: \(Int(DifficultyFactor()))X"
     }
     
     func RefreshButtonsForKey()
@@ -656,6 +912,10 @@ class ViewController: UIViewController,UIScrollViewDelegate,ProgressionManagerDe
     
     //DELEGATE FUNCTIONS
     func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool){
+        
+        //after user has checked out the settings
+        StopArrowAnimation()
+        
         if scrollView.contentOffset.y > 175
         {
             scrollView.setContentOffset(CGPoint(x: 0, y: 350), animated: true)

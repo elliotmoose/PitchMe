@@ -14,8 +14,7 @@ public class SettingsManager
     public static var bpm = 120
     public static var key = 3
     public static var selectedInstrument = 0
-    public static var vibrationOn = true
-    public static var allFeaturesUnlocked = false
+    public static var vibrationOn = true    
     
     public static func RandomizeKey()
     {
